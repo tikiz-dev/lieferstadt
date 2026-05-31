@@ -39,6 +39,11 @@
   #actBtn .key{font-size:11px;color:#94a3b8;font-weight:700}
   #actBtn:active .ring{transform:scale(.93)}
   #actBtn.show{display:flex}
+  #infoBtn{position:fixed;right:120px;bottom:140px;z-index:12;display:none;align-items:center;justify-content:center;
+    width:52px;height:52px;border-radius:50%;background:rgba(30,38,50,.92);border:2px solid rgba(255,255,255,.25);
+    color:#cbd5e1;font-size:20px;font-weight:800;cursor:pointer;pointer-events:auto;box-shadow:0 6px 22px rgba(0,0,0,.5)}
+  #infoBtn:active{transform:scale(.93)}
+  #infoBtn.show{display:flex}
 
   #stick{position:fixed;z-index:9;display:none}
   #stick .base{position:absolute;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12)}
@@ -95,6 +100,7 @@
 </div>
 
 <button id="actBtn"><div class="ring"></div><div class="key">Taste E</div></button>
+<button id="infoBtn">ⓘ</button>
 <div id="stick"><div class="base"></div><div class="knob"></div></div>
 <div id="toasts"></div>
 
@@ -104,18 +110,19 @@
 <!-- Start / menu -->
 <div class="modal show" id="overlay"><div class="panel">
   <h1>Lieferstadt</h1>
-  <div class="tag">Logistik-Aufbauspiel · v2</div>
+  <div class="tag">Logistik-Aufbauspiel · v4</div>
   <p>Baue eine Stadt aus Betrieben auf und verbinde sie mit deinem <b>Lieferfahrzeug</b>: Rohstoffe abholen, zur Fabrik bringen, dort verarbeiten lassen, Fertigwaren zum Markt fahren und verkaufen.</p>
   <div style="display:flex;gap:8px;margin:14px 0;align-items:center;flex-wrap:wrap">
     <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
     <span style="color:#64748b;font-size:13px">fahren ·</span> <kbd>E</kbd>
-    <span style="color:#64748b;font-size:13px">Aktion (am Handy: Knopf)</span>
+    <span style="color:#64748b;font-size:13px">andocken ·</span> <kbd>Q</kbd>
+    <span style="color:#64748b;font-size:13px">Details (am Handy: Knöpfe / Gebäude antippen)</span>
   </div>
-  <p style="font-size:13px">An jeder Location stehen Felder am Straßenrand. Fahr auf ein Feld und drücke <kbd style="padding:2px 7px">E</kbd>:</p>
-  <div class="row"><span class="dot" style="background:#f59e0b"></span><div><b>ABLADEN</b> – passende Materialien ins Gebäude geben (für Fabriken).</div></div>
-  <div class="row"><span class="dot" style="background:#60a5fa"></span><div><b>AUFLADEN</b> – fertige Ware/Rohstoff ins Fahrzeug laden.</div></div>
-  <div class="row"><span class="dot" style="background:#cbd5e1"></span><div><b>DETAILS</b> – Rezept, Tempo, Materialbedarf & Aufrüsten ansehen.</div></div>
-  <div class="row"><span class="dot" style="background:#4ade80"></span><div><b>MARKT</b> verkauft, <b>GARAGE</b> rüstet das Fahrzeug auf.</div></div>
+  <p style="font-size:13px">Fahr an die <b>Andock-Zone</b> an der Straßenseite eines Betriebs und drücke <kbd style="padding:2px 7px">E</kbd>:</p>
+  <div class="row"><span class="dot" style="background:#60a5fa"></span><div><b>UMSCHLAG</b> an Fabriken: lädt in einem Zug Material ab <i>und</i> fertige Ware auf. <b>LADEN</b> bei Rohstoff-Betrieben.</div></div>
+  <div class="row"><span class="dot" style="background:#4ade80"></span><div><b>VERKAUF</b> am Markt leert das Fahrzeug gegen Geld.</div></div>
+  <div class="row"><span class="dot" style="background:#fbbf24"></span><div>Status-Ring zeigt: 🟡 voll (abholen) · 🔴 hungrig (beliefern) · 🟢 läuft.</div></div>
+  <div class="row"><span class="dot" style="background:#cbd5e1"></span><div><b>Details/Bauen/Aufrüsten</b>: Info-Knopf <b>ⓘ</b> bzw. Gebäude antippen.</div></div>
   <button class="btn" id="startBtn">Los geht's</button>
   <button class="btn ghost" id="resetBtn" style="margin-top:10px">Spielstand zurücksetzen</button>
 </div></div>
@@ -217,22 +224,24 @@ function garageCost(w){ const base=w==='cap'?VEH.capCost:VEH.speedCost, lv=w==='
   return Math.floor(base*Math.pow(VEH.garageGrow,lv)); }
 
 //---------------------------------------------------------------
-// Felder (3 pro Location, am Straßenrand)
+// Andock-Zone: EIN breiter Streifen an der Straßenseite jedes Gebäudes
 //---------------------------------------------------------------
-function fieldsFor(b){
-  let types;
-  if(b.kind==='producer'){ const o=state.biz[b.id].owned; types=o?['aufladen','details']:['bauen','details']; }
-  else if(b.kind==='factory'){ const o=state.biz[b.id].owned; types=o?['abladen','aufladen','details']:['bauen','details']; }
-  else if(b.kind==='market') types=['verkaufen','details'];
-  else if(b.kind==='garage') types=['tempo','ladung','details'];
-  const n=types.length, fy=b.y+(b.front==='N'?-OFFF:OFFF);
-  return types.map((t,i)=>{ const cx=b.x+(i-(n-1)/2)*78;
-    return {b,type:t,x:cx-FW/2,y:fy-FW/2,w:FW,h:FW}; });
+const DOCK_H=64, DOCK_REACH=110;
+function dockRect(b){ const w=PLOT, h=DOCK_H;
+  const y=b.front==='N' ? b.y-PLOT/2-14-h : b.y+PLOT/2+14;
+  return {x:b.x-w/2, y, w, h}; }
+function dockZone(b){ const w=PLOT+56; // großzügiger Fangbereich bis auf die Straße
+  const y=b.front==='N' ? b.y-PLOT/2-DOCK_REACH : b.y+PLOT/2;
+  return {x:b.x-w/2, y, w, h:DOCK_REACH}; }
+// Haupt-Aktion am Dock je nach Gebäudetyp
+function dockAction(b){ const s=state.biz[b.id];
+  if(b.kind==='market')   return {key:'verkaufen', label:'VERKAUF', c:'#4ade80'};
+  if(b.kind==='garage')   return {key:'open',      label:'GARAGE',  c:'#a855f7'};
+  if(!s.owned)            return {key:'open',      label:'BAUEN',   c:'#f59e0b'};
+  if(b.kind==='producer') return {key:'laden',     label:'LADEN',   c:'#60a5fa'};
+  return {key:'umschlag', label:'UMSCHLAG', c:'#60a5fa'}; // Fabrik
 }
-const FIELD_STYLE={ bauen:{label:'BAUEN',c:'#f59e0b'}, abladen:{label:'ABLADEN',c:'#f59e0b'},
-  aufladen:{label:'AUFLADEN',c:'#60a5fa'}, details:{label:'DETAILS',c:'#cbd5e1'},
-  verkaufen:{label:'VERKAUF',c:'#4ade80'}, tempo:{label:'TEMPO',c:'#a855f7'}, ladung:{label:'LADUNG',c:'#a855f7'} };
-function allFields(){ const a=[]; for(const b of BUILDINGS) for(const f of fieldsFor(b)) a.push(f); return a; }
+function hasInfo(b){ const s=state.biz[b.id]; return b.kind==='market' || (s&&s.owned); }
 function bodyRect(b){ return {x:b.x-PLOT/2,y:b.y-PLOT/2,w:PLOT,h:PLOT}; }
 function isSolid(b){ if(b.kind==='market'||b.kind==='garage') return true; return state.biz[b.id].owned; }
 
@@ -256,6 +265,7 @@ function buildingStatus(b){
 const keys={};
 addEventListener('keydown',e=>{ const k=e.key.toLowerCase();
   if(k==='e'){ if(!e.repeat) triggerAction(); e.preventDefault(); return; }
+  if(k==='q'){ if(!e.repeat) triggerInfo(); e.preventDefault(); return; }
   if(k==='escape'){ if(detailOpen) closeDetail(); return; }
   keys[k]=true;
   if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault(); });
@@ -289,7 +299,7 @@ function overlap(p,f){ const px=Math.max(f.x,Math.min(p.x,f.x+f.w)), py=Math.max
 //---------------------------------------------------------------
 // Actions (ausgelöst per E / Knopf)
 //---------------------------------------------------------------
-let currentField=null;
+let currentDock=null;   // Gebäude, an dessen Andock-Zone das Fahrzeug gerade steht
 const popups=[];
 function popup(x,y,text,color){ popups.push({x,y,text,color,life:1.1}); }
 
@@ -312,7 +322,24 @@ const SFX={
   err:()=>{ beep(150,0.18,'sawtooth',0.09); },
 };
 
-function triggerAction(){ if(detailOpen||!running||!currentField) return; performAction(currentField); }
+function triggerAction(){ if(detailOpen||!running||!currentDock) return; performDock(currentDock); }
+function triggerInfo(){ if(!running||!currentDock) return; openDetail(currentDock); }
+// Smarte Dock-Aktion: Fabrik schlägt in einem Rutsch Material ab UND lädt Fertigware auf
+function performDock(b){ const s=state.biz[b.id];
+  if(b.kind==='market'){ performAction({b,type:'verkaufen'}); return; }
+  if(b.kind==='garage' || !(s&&s.owned)){ openDetail(b); return; }
+  if(b.kind==='producer'){ performAction({b,type:'aufladen'}); return; }
+  // Fabrik: kombinierter Umschlag
+  let unloaded=0;
+  for(const g in b.recipe.in){ const have=veh.inv[g]||0; if(have<=0) continue;
+    const space=inCap(b)-(s.inStock[g]||0); const mv=Math.min(have,space);
+    if(mv>0.001){ s.inStock[g]=(s.inStock[g]||0)+mv; addInv(g,-mv); unloaded+=mv; } }
+  const good=b.recipe.out; const take=Math.min(s.outStock, invFree());
+  if(take>0.001){ s.outStock-=take; addInv(good,take); }
+  if(unloaded<0.5 && take<0.5){ toast(invFree()<=0&&s.outStock>0?'Fahrzeug voll':'Nichts umzuschlagen','bad'); SFX.err(); return; }
+  const parts=[]; if(unloaded>=0.5) parts.push('−'+Math.floor(unloaded)); if(take>=0.5) parts.push('+'+Math.floor(take)+' '+GOODS[good].n);
+  popup(b.x,b.y, parts.join('  '), take>=0.5?GOODS[good].c:'#94a3b8'); SFX.load(); save();
+}
 function performAction(f){
   const b=f.b, s=state.biz[b.id];
   switch(f.type){
@@ -349,6 +376,12 @@ function performAction(f){
   }
 }
 document.getElementById('actBtn').addEventListener('click',triggerAction);
+document.getElementById('infoBtn').addEventListener('click',triggerInfo);
+// Klick/Tippen auf ein Gebäude öffnet dessen Details
+canvas.addEventListener('click',e=>{ if(!running||detailOpen) return;
+  const wx=cam.x+e.clientX, wy=cam.y+e.clientY;
+  for(const b of BUILDINGS){ const r=bodyRect(b);
+    if(wx>=r.x&&wx<=r.x+r.w&&wy>=r.y&&wy<=r.y+r.h){ openDetail(b); return; } } });
 
 function toast(msg,kind){ const el=document.createElement('div'); el.className='toast '+(kind||''); el.textContent=msg;
   document.getElementById('toasts').appendChild(el);
@@ -392,11 +425,11 @@ function update(dt){
     }
   }
 
-  // current field detection
-  currentField=null; let bestD=1e9;
-  for(const f of allFields()){ if(overlap(veh,f)){
-    const cx=f.x+f.w/2, cy=f.y+f.h/2, d=Math.hypot(veh.x-cx,veh.y-cy);
-    if(d<bestD){ bestD=d; currentField=f; } } }
+  // Andock-Erkennung: Fahrzeug in der Zone vor einem Gebäude?
+  currentDock=null; let bestD=1e9;
+  for(const b of BUILDINGS){ const z=dockZone(b);
+    if(veh.x>=z.x&&veh.x<=z.x+z.w&&veh.y>=z.y&&veh.y<=z.y+z.h){
+      const d=Math.hypot(veh.x-b.x,veh.y-b.y); if(d<bestD){ bestD=d; currentDock=b; } } }
 
   // camera
   const tx=veh.x-VW/2, ty=veh.y-VH/2;
@@ -473,7 +506,7 @@ function drawBuilding(b){
   const nameY = b.front==='N' ? body.y+PLOT+24 : body.y-16;
   ctx.fillStyle=owned?'#fff':'#94a3b8'; ctx.font='800 16px system-ui'; ctx.textAlign='center';
   ctx.fillText(b.name+(s&&s.owned?(' · St '+s.level):''), b.x, nameY);
-  for(const f of fieldsFor(b)) drawField(f);
+  drawDock(b);
 }
 function drawBuildingIcon(b){
   ctx.save();
@@ -487,26 +520,29 @@ function drawBuildingIcon(b){
   else if(b.kind==='garage'){ ctx.fillStyle='#0c1118'; ctx.font='800 30px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🔧',b.x,b.y+2); ctx.textBaseline='alphabetic'; }
   ctx.restore();
 }
-function drawField(f){
-  const st=FIELD_STYLE[f.type], active=currentField&&currentField.b.id===f.b.id&&currentField.type===f.type;
+function drawDock(b){
+  const r=dockRect(b), act=dockAction(b), docked=currentDock&&currentDock.id===b.id;
   ctx.save();
-  ctx.fillStyle=st.c; ctx.globalAlpha=active?1:0.82;
-  roundRect(f.x,f.y,f.w,f.h,10); ctx.fill(); ctx.globalAlpha=1;
-  ctx.strokeStyle=active?'#fff':'rgba(255,255,255,.35)'; ctx.lineWidth=active?3:2;
-  roundRect(f.x,f.y,f.w,f.h,10); ctx.stroke();
-  const dark = f.type==='details';
-  ctx.fillStyle=dark?'#0c1118':'#0c1118'; ctx.textAlign='center'; ctx.font='800 11px system-ui';
-  ctx.fillText(st.label, f.x+f.w/2, f.y+f.h/2-3);
-  // dynamic value line
-  let sub=fieldValueText(f); if(sub){ ctx.font='700 11px system-ui'; ctx.fillText(sub, f.x+f.w/2, f.y+f.h/2+12); }
+  // Andock-Bay: gestreifter Streifen, leuchtet wenn das Fahrzeug andockt
+  ctx.globalAlpha=docked?0.95:0.4;
+  ctx.fillStyle=docked?act.c:'#2c3744'; roundRect(r.x,r.y,r.w,r.h,10); ctx.fill();
+  ctx.globalAlpha=1; ctx.strokeStyle=docked?'#fff':'rgba(255,255,255,.22)'; ctx.lineWidth=docked?3:2;
+  roundRect(r.x,r.y,r.w,r.h,10); ctx.stroke();
+  // Pfeile, die zum Gebäude zeigen
+  ctx.fillStyle=docked?'#0c1118':'rgba(255,255,255,.3)';
+  const ay=r.y+r.h/2, dir=b.front==='N'?1:-1, baseY=b.front==='N'?r.y+r.h-8:r.y+8;
+  ctx.textAlign='center'; ctx.font='800 13px system-ui';
+  ctx.fillText(act.label, r.x+r.w/2, ay+ (b.front==='N'?-2:4));
+  // kleine Statuszahl (Lager/Ausgang) als Kontext
+  ctx.font='700 11px system-ui';
+  ctx.fillText(dockSub(b), r.x+r.w/2, ay+13);
   ctx.restore();
 }
-function fieldValueText(f){ const b=f.b, s=state.biz[b.id];
-  if(f.type==='bauen') return '$'+fmt(cost(b));
-  if(f.type==='tempo') return '$'+fmt(garageCost('speed'));
-  if(f.type==='ladung') return '$'+fmt(garageCost('cap'));
-  if(f.type==='aufladen'){ const v=b.kind==='producer'?s.stock:s.outStock; return Math.floor(v)+''; }
-  if(f.type==='abladen'){ return Object.keys(b.recipe.in).map(g=>Math.floor(s.inStock[g]||0)).join('/'); }
+function dockSub(b){ const s=state.biz[b.id];
+  if(!s||!s.owned){ if(b.kind==='market'||b.kind==='garage') return ''; return '$'+fmt(cost(b)); }
+  if(b.kind==='producer') return Math.floor(s.stock)+' '+GOODS[b.out].n;
+  if(b.kind==='factory'){ const ins=Object.keys(b.recipe.in).map(g=>Math.floor(s.inStock[g]||0)).join('/');
+    return 'Lager '+ins+' · Aus '+Math.floor(s.outStock); }
   return '';
 }
 function drawVehicle(){
@@ -530,33 +566,33 @@ function drawVehicle(){
 const elMoney=document.querySelector('#money .val'), elChips=document.querySelector('#cargo .chips');
 const elCapNum=document.getElementById('capnum'), elCapBar=document.querySelector('#capbar i');
 const actBtn=document.getElementById('actBtn'), actRing=actBtn.querySelector('.ring'), actKey=actBtn.querySelector('.key');
+const infoBtn=document.getElementById('infoBtn');
 function updateHUD(){
   elMoney.textContent='$'+fmt(state.money);
   const tot=invTotal(), cap=vehCap();
   elCapNum.textContent=Math.floor(tot)+'/'+cap; elCapBar.style.width=Math.min(100,tot/cap*100)+'%';
   const ks=Object.keys(veh.inv);
   elChips.innerHTML = ks.length ? ks.map(g=>`<span class="chip"><span class="d" style="background:${GOODS[g].c}"></span>${GOODS[g].n} ${Math.floor(veh.inv[g])}</span>`).join('') : '<span class="chip empty">leer</span>';
-  // action button
-  if(currentField && running && !detailOpen){ const st=FIELD_STYLE[currentField.type];
-    actBtn.classList.add('show'); actRing.style.background=st.c;
-    actRing.textContent=st.label+' · '+currentField.b.name.split(' ')[0];
-    actKey.textContent=previewText(currentField)+(isTouch()?'':' · Taste E');
-  } else actBtn.classList.remove('show');
+  // Andock-Knopf (Haupt-Aktion) + Info-Knopf
+  if(currentDock && running && !detailOpen){ const b=currentDock, act=dockAction(b);
+    actBtn.classList.add('show'); actRing.style.background=act.c;
+    actRing.textContent=act.label+' · '+b.name.split(' ')[0];
+    actKey.textContent=dockPreview(b)+(isTouch()?'':' · E');
+    if(hasInfo(b)) infoBtn.classList.add('show'); else infoBtn.classList.remove('show');
+  } else { actBtn.classList.remove('show'); infoBtn.classList.remove('show'); }
 }
-function previewText(f){ const b=f.b, s=state.biz[b.id];
-  switch(f.type){
-    case 'bauen': return 'baut für $'+fmt(cost(b));
-    case 'details': return 'Infos & Aufrüsten';
-    case 'verkaufen': { let v=0; for(const g in veh.inv) if(GOODS[g].v>0) v+=veh.inv[g]*GOODS[g].v;
-      return v>0?('verkauft für +$'+fmt(v)):'nichts zu verkaufen'; }
-    case 'aufladen': { const avail=b.kind==='producer'?s.stock:s.outStock; const good=b.kind==='producer'?b.out:b.recipe.out;
-      const take=Math.min(avail,invFree()); return take>=0.5?('lädt '+Math.floor(take)+' '+GOODS[good].n):'nichts da'; }
-    case 'abladen': { let parts=[]; for(const g in b.recipe.in){ const mv=Math.min(veh.inv[g]||0, inCap(b)-(s.inStock[g]||0));
-      if(mv>=0.5) parts.push(Math.floor(mv)+' '+GOODS[g].n); } return parts.length?('lädt '+parts.join(', ')+' ab'):'kein Material'; }
-    case 'tempo': return 'Tempo +  ($'+fmt(garageCost('speed'))+')';
-    case 'ladung': return 'Ladung +  ($'+fmt(garageCost('cap'))+')';
-  }
-  return isTouch()?'tippen':'Taste E';
+function dockPreview(b){ const s=state.biz[b.id];
+  if(b.kind==='market'){ let v=0; for(const g in veh.inv) if(GOODS[g].v>0) v+=veh.inv[g]*GOODS[g].v;
+    return v>0?('verkauft für +$'+fmt(v)):'nichts zu verkaufen'; }
+  if(b.kind==='garage') return 'Fahrzeug aufrüsten';
+  if(!s.owned) return 'bauen für $'+fmt(cost(b));
+  if(b.kind==='producer'){ const take=Math.min(s.stock,invFree());
+    return take>=0.5?('lädt '+Math.floor(take)+' '+GOODS[b.out].n):(invFree()<=0?'Fahrzeug voll':'nichts da'); }
+  // Fabrik: kombinierter Umschlag
+  let unl=0; for(const g in b.recipe.in) unl+=Math.min(veh.inv[g]||0, inCap(b)-(s.inStock[g]||0));
+  const take=Math.min(s.outStock,invFree());
+  const parts=[]; if(unl>=0.5) parts.push('−'+Math.floor(unl)+' Mat.'); if(take>=0.5) parts.push('+'+Math.floor(take)+' '+GOODS[b.recipe.out].n);
+  return parts.length?parts.join(' / '):'nichts umzuschlagen';
 }
 
 //---------------------------------------------------------------
@@ -571,7 +607,7 @@ function renderDetail(){ const b=detailFor; if(!b) return; const s=state.biz[b.i
   h+=`<h2><span style="width:16px;height:16px;border-radius:5px;background:${b.color};display:inline-block"></span>${b.name}</h2>`;
   if(b.kind==='producer'){
     h+=`<div class="tag">Rohstoff-Produzent${s.owned?' · Stufe '+s.level:''}</div>`;
-    h+=`<p>Stellt automatisch ${goodChip(b.out)} her – ganz ohne Materialeinsatz. Fahr das ${FIELD_STYLE.aufladen.label}-Feld an, um den Vorrat ins Fahrzeug zu laden.</p>`;
+    h+=`<p>Stellt automatisch ${goodChip(b.out)} her – ganz ohne Materialeinsatz. Dock an der Straßenseite an und drücke <b>LADEN</b>, um den Vorrat ins Fahrzeug zu holen.</p>`;
     if(s.owned){
       h+=`<div class="stat"><span class="k">Produktion</span><span class="v">${prodRate(b).toFixed(2)} ${GOODS[b.out].n}/s</span></div>`;
       h+=`<div class="stat"><span class="k">Lager</span><span class="v">${Math.floor(s.stock)} / ${Math.floor(prodCap(b))}</span></div>`;
@@ -581,7 +617,7 @@ function renderDetail(){ const b=detailFor; if(!b) return; const s=state.biz[b.i
     const r=b.recipe;
     h+=`<div class="tag">Fabrik${s.owned?' · Stufe '+s.level:''}</div>`;
     h+=`<div class="recipe">${Object.entries(r.in).map(([g,q])=>goodChip(g,q)).join(' + ')} <span style="color:#64748b">→</span> ${goodChip(r.out,r.outQty)}</div>`;
-    h+=`<p>Sobald genug Material abgeladen ist, produziert die Fabrik <b>automatisch</b> – eine Charge dauert Zeit. Material per ${FIELD_STYLE.abladen.label} liefern, Fertigware per ${FIELD_STYLE.aufladen.label} abholen.</p>`;
+    h+=`<p>Sobald genug Material da ist, produziert die Fabrik <b>automatisch</b> – eine Charge dauert Zeit. Beim Andocken erledigt <b>UMSCHLAG</b> beides in einem Zug: Material abladen und fertige Ware aufladen.</p>`;
     if(s.owned){
       h+=`<div class="stat"><span class="k">Dauer je Charge</span><span class="v">${craftTime(b).toFixed(1)} s → ${r.outQty}× ${GOODS[r.out].n}</span></div>`;
       for(const g in r.in) h+=`<div class="stat"><span class="k">Eingang ${GOODS[g].n}</span><span class="v">${Math.floor(s.inStock[g]||0)} / ${Math.floor(inCap(b))}</span></div>`;
@@ -595,7 +631,7 @@ function renderDetail(){ const b=detailFor; if(!b) return; const s=state.biz[b.i
     h+=`<div class="stat"><span class="k" style="font-weight:700;color:#cbd5e1">Ware</span><span class="v">Preis / Stück</span></div>`;
     for(const g in GOODS) if(GOODS[g].v>0) h+=`<div class="stat"><span class="k">${goodChip(g)}</span><span class="v" style="color:#4ade80">$${GOODS[g].v}</span></div>`;
   } else if(b.kind==='garage'){
-    h+=`<div class="tag">Garage</div><p>Rüste dein Lieferfahrzeug auf. Fahr die Felder ${FIELD_STYLE.tempo.label} bzw. ${FIELD_STYLE.ladung.label} an oder nutze die Knöpfe hier.</p>`;
+    h+=`<div class="tag">Garage</div><p>Rüste dein Lieferfahrzeug auf – mehr Ladekapazität oder mehr Tempo.</p>`;
     h+=`<div class="stat"><span class="k">Ladekapazität</span><span class="v">${vehCap()} (Stufe ${state.capLv})</span></div>`;
     h+=`<div class="stat"><span class="k">Tempo</span><span class="v">Stufe ${state.speedLv}</span></div>`;
     const cc=garageCost('cap'), sc=garageCost('speed');
