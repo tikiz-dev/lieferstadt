@@ -30,15 +30,15 @@
     border-radius:12px;width:44px;height:44px;color:#cbd5e1;font-size:20px;cursor:pointer;flex:none}
   #menuBtn:active{transform:scale(.94)}
 
-  #prompt{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);
-    background:rgba(18,22,30,.94);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px 22px;
-    text-align:center;z-index:10;opacity:0;transition:opacity .15s,transform .15s;pointer-events:none;
-    box-shadow:0 10px 40px rgba(0,0,0,.5);min-width:240px;max-width:90vw}
-  #prompt.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  #prompt .title{font-size:16px;font-weight:700}
-  #prompt .sub{font-size:13px;color:#94a3b8;margin-top:3px;line-height:1.5}
-  #prompt .ok{color:#4ade80;font-weight:700}.#prompt .no{color:#f87171;font-weight:700}
-  .cost{font-weight:700}.cost.ok{color:#4ade80}.cost.no{color:#f87171}
+  /* contextual action prompt */
+  #actBtn{position:fixed;right:22px;bottom:120px;z-index:12;display:none;flex-direction:column;align-items:center;gap:4px;
+    pointer-events:auto;background:none;border:none;cursor:pointer;font-family:inherit}
+  #actBtn .ring{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;color:#0c1118;box-shadow:0 8px 30px rgba(0,0,0,.5);border:3px solid rgba(255,255,255,.7);
+    text-align:center;line-height:1.05;padding:6px}
+  #actBtn .key{font-size:11px;color:#94a3b8;font-weight:700}
+  #actBtn:active .ring{transform:scale(.93)}
+  #actBtn.show{display:flex}
 
   #stick{position:fixed;z-index:9;display:none}
   #stick .base{position:absolute;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12)}
@@ -51,22 +51,34 @@
   .toast.good{border-color:rgba(74,222,128,.4)}.toast.bad{border-color:rgba(248,113,113,.4)}
   @keyframes tIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
 
-  #overlay{position:fixed;inset:0;z-index:30;background:rgba(8,10,14,.84);backdrop-filter:blur(6px);
+  .modal{position:fixed;inset:0;z-index:30;background:rgba(8,10,14,.84);backdrop-filter:blur(6px);
     display:none;align-items:center;justify-content:center}
-  #overlay.show{display:flex}
-  .panel{background:#141a23;border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:26px 28px;
-    max-width:440px;width:calc(100% - 40px);max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.6)}
-  .panel h1{font-size:25px;font-weight:800;letter-spacing:-.02em}
-  .panel .tag{color:#60a5fa;font-size:13px;font-weight:600;margin-bottom:16px}
+  .modal.show{display:flex}
+  .panel{background:#141a23;border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:24px 26px;
+    max-width:460px;width:calc(100% - 36px);max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .panel h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
+  .panel h2{font-size:21px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+  .panel .tag{color:#60a5fa;font-size:13px;font-weight:600;margin-bottom:14px}
   .panel p{color:#b6c0cc;font-size:14px;line-height:1.6;margin-bottom:10px}
   .panel .row{display:flex;align-items:flex-start;gap:10px;margin:8px 0;font-size:14px;color:#b6c0cc}
   .panel .dot{width:14px;height:14px;border-radius:4px;flex:none;margin-top:2px}
   .panel kbd{background:#232b36;border:1px solid rgba(255,255,255,.12);border-bottom-width:3px;border-radius:8px;
     padding:5px 10px;font-size:13px;font-weight:700;font-family:inherit}
-  .panel button{margin-top:16px;width:100%;background:#4ade80;color:#0c1118;border:none;border-radius:14px;
-    padding:14px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit}
-  .panel button:active{transform:scale(.98)}
-  .panel .reset{background:transparent;color:#64748b;border:1px solid rgba(255,255,255,.1);margin-top:10px;font-weight:600}
+  .stat{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:7px 0;border-top:1px solid rgba(255,255,255,.07)}
+  .stat:first-of-type{border-top:none}
+  .stat .k{color:#94a3b8}.stat .v{font-weight:700}
+  .recipe{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:rgba(255,255,255,.04);border-radius:10px;
+    padding:10px 12px;margin:10px 0;font-size:14px;font-weight:700}
+  .g{display:inline-flex;align-items:center;gap:5px}.g .d{width:13px;height:13px;border-radius:3px}
+  .pbar{height:9px;background:#0d1722;border-radius:5px;overflow:hidden;margin-top:6px}
+  .pbar i{display:block;height:100%;background:#fbbf24;border-radius:5px}
+  .btn{margin-top:14px;width:100%;background:#4ade80;color:#0c1118;border:none;border-radius:13px;padding:13px;
+    font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+  .btn:active{transform:scale(.98)}
+  .btn:disabled{background:#33414f;color:#7e8b99;cursor:not-allowed}
+  .btn.blue{background:#60a5fa}.btn.purple{background:#a855f7;color:#fff}
+  .btn.ghost{background:transparent;color:#94a3b8;border:1px solid rgba(255,255,255,.12);font-weight:600}
+  .btnrow{display:flex;gap:10px}.btnrow .btn{flex:1}
 </style>
 </head>
 <body>
@@ -75,39 +87,43 @@
 <div id="hud">
   <div class="box" id="money"><div class="label">Guthaben</div><div class="val">$0</div></div>
   <div class="box" id="cargo">
-    <div class="label">Ladung <span id="capnum" style="color:#cbd5e1">0/10</span></div>
+    <div class="label">Ladung <span id="capnum" style="color:#cbd5e1">0/12</span></div>
     <div class="chips"></div>
     <div id="capbar"><i style="width:0%"></i></div>
   </div>
   <button id="menuBtn">☰</button>
 </div>
 
-<div id="prompt"><div class="title"></div><div class="sub"></div></div>
+<button id="actBtn"><div class="ring"></div><div class="key">Taste E</div></button>
 <div id="stick"><div class="base"></div><div class="knob"></div></div>
 <div id="toasts"></div>
 
-<div id="overlay" class="show">
-  <div class="panel">
-    <h1>Lieferstadt</h1>
-    <div class="tag">Logistik-Aufbauspiel · v1</div>
-    <p>Baue eine Stadt aus Betrieben auf und verbinde sie mit deinem <b>Lieferfahrzeug</b>: Rohstoffe abholen, zur Fabrik bringen, Fertigwaren zum Markt fahren und verkaufen.</p>
-    <div style="display:flex;gap:8px;margin:14px 0;align-items:center">
-      <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
-      <span style="color:#64748b;font-size:13px">/ Pfeiltasten / Touch-Stick zum Fahren</span>
-    </div>
-    <div class="row"><span class="dot" style="background:#fbbf24"></span><div>Fahr auf ein <b>BAUEN</b>-Feld (gelb), um einen Betrieb zu eröffnen – oder zum <b>Aufrüsten</b>, wenn er dir schon gehört.</div></div>
-    <div class="row"><span class="dot" style="background:#60a5fa"></span><div>Fahr auf das <b>LADEN</b>-Feld (blau) eines Betriebs: Rohstoffe werden abgeladen, Fertigwaren aufgeladen.</div></div>
-    <div class="row"><span class="dot" style="background:#4ade80"></span><div>Fahr auf den <b>MARKT</b> (grün), um Fertigwaren aus deinem Fahrzeug zu verkaufen.</div></div>
-    <div class="row"><span class="dot" style="background:#a855f7"></span><div>In der <b>GARAGE</b> rüstest du Ladekapazität & Tempo deines Fahrzeugs auf.</div></div>
-    <button id="startBtn">Los geht's</button>
-    <button id="resetBtn" class="reset">Spielstand zurücksetzen</button>
+<!-- Details / building modal -->
+<div class="modal" id="detail"><div class="panel" id="detailBody"></div></div>
+
+<!-- Start / menu -->
+<div class="modal show" id="overlay"><div class="panel">
+  <h1>Lieferstadt</h1>
+  <div class="tag">Logistik-Aufbauspiel · v2</div>
+  <p>Baue eine Stadt aus Betrieben auf und verbinde sie mit deinem <b>Lieferfahrzeug</b>: Rohstoffe abholen, zur Fabrik bringen, dort verarbeiten lassen, Fertigwaren zum Markt fahren und verkaufen.</p>
+  <div style="display:flex;gap:8px;margin:14px 0;align-items:center;flex-wrap:wrap">
+    <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+    <span style="color:#64748b;font-size:13px">fahren ·</span> <kbd>E</kbd>
+    <span style="color:#64748b;font-size:13px">Aktion (am Handy: Knopf)</span>
   </div>
-</div>
+  <p style="font-size:13px">An jeder Location stehen Felder am Straßenrand. Fahr auf ein Feld und drücke <kbd style="padding:2px 7px">E</kbd>:</p>
+  <div class="row"><span class="dot" style="background:#f59e0b"></span><div><b>ABLADEN</b> – passende Materialien ins Gebäude geben (für Fabriken).</div></div>
+  <div class="row"><span class="dot" style="background:#60a5fa"></span><div><b>AUFLADEN</b> – fertige Ware/Rohstoff ins Fahrzeug laden.</div></div>
+  <div class="row"><span class="dot" style="background:#cbd5e1"></span><div><b>DETAILS</b> – Rezept, Tempo, Materialbedarf & Aufrüsten ansehen.</div></div>
+  <div class="row"><span class="dot" style="background:#4ade80"></span><div><b>MARKT</b> verkauft, <b>GARAGE</b> rüstet das Fahrzeug auf.</div></div>
+  <button class="btn" id="startBtn">Los geht's</button>
+  <button class="btn ghost" id="resetBtn" style="margin-top:10px">Spielstand zurücksetzen</button>
+</div></div>
 
 <script>
 "use strict";
 //===================================================================
-// LIEFERSTADT — Top-Down Logistik / Produktionsketten (single file)
+// LIEFERSTADT v2 — Logistik / Produktionsketten
 //===================================================================
 const canvas=document.getElementById('game'), ctx=canvas.getContext('2d');
 let DPR=Math.min(window.devicePixelRatio||1,2), VW=0, VH=0;
@@ -124,42 +140,44 @@ const GOODS = {
   erz:      {n:'Erz',      c:'#9fb1bf', v:0},
   bretter:  {n:'Bretter',  c:'#d9883f', v:9},
   brot:     {n:'Brot',     c:'#e7b35a', v:8},
-  stahl:    {n:'Stahl',    c:'#7c93a8', v:16},
-  moebel:   {n:'Möbel',    c:'#7d4fd0', v:34},
-  werkzeug: {n:'Werkzeug', c:'#e2614f', v:52},
+  stahl:    {n:'Stahl',    c:'#7c93a8', v:18},
+  moebel:   {n:'Möbel',    c:'#7d4fd0', v:40},
+  werkzeug: {n:'Werkzeug', c:'#e2614f', v:60},
 };
 
 //---------------------------------------------------------------
-// Gebäude / Betriebe in der Stadt
-//   kind: producer | factory | market | garage
-//   producer: out, rate, cap        factory: recipe{in,out,rate}
-//   producers & factories sind kaufbar; markt & garage gehören dir gratis
+// Straßennetz (Gitter) + Standorte am Straßenrand
+//   Vertikale Straßen X: 360,1080,1800,2520   Horizontale Y: 320,1040,1760
+//   front 'N' = Felder/Straße nördlich des Gebäudes, 'S' = südlich
 //---------------------------------------------------------------
+const WORLD={w:2880,h:2080};
+const ROADW=84;                         // Straßenbreite
+const VROADS=[360,1080,1800,2520], HROADS=[320,1040,1760];
+const OFFB=193, OFFF=113;               // Gebäudezentrum bzw. Feld-Reihe vom Straßencenter
+const PLOT=150, FW=64;                  // Gebäude- und Feldgröße
+
 const BUILDINGS = [
-  // --- Rohstoff-Produzenten ---
-  {id:'wald',    name:'Forst',        kind:'producer', x:480,  y:520,  color:'#3f8a5b', cost:150,  out:'holz',     rate:1.3, cap:40},
-  {id:'farm',    name:'Bauernhof',    kind:'producer', x:480,  y:1480, color:'#b7973a', cost:180,  out:'getreide', rate:1.3, cap:40},
-  {id:'mine',    name:'Eisenmine',    kind:'producer', x:2280, y:1480, color:'#6b7682', cost:600,  out:'erz',      rate:0.9, cap:30},
-  // --- Fabriken (Veredelung) ---
-  {id:'saege',   name:'Sägewerk',     kind:'factory',  x:900,  y:520,  color:'#c47a3d', cost:350,  recipe:{in:{holz:1},            out:'bretter', rate:0.8}},
-  {id:'baeck',   name:'Bäckerei',     kind:'factory',  x:900,  y:1480, color:'#caa052', cost:380,  recipe:{in:{getreide:1},        out:'brot',    rate:0.8}},
-  {id:'schmelz', name:'Schmelze',     kind:'factory',  x:2280, y:980,  color:'#5f7387', cost:1100, recipe:{in:{erz:1},             out:'stahl',   rate:0.55}},
-  {id:'moebel',  name:'Möbelfabrik',  kind:'factory',  x:1740, y:520,  color:'#6a45b0', cost:1500, recipe:{in:{bretter:2},         out:'moebel',  rate:0.4}},
-  {id:'werk',    name:'Werkstatt',    kind:'factory',  x:1740, y:1480, color:'#c2503f', cost:3000, recipe:{in:{stahl:1,bretter:1}, out:'werkzeug',rate:0.32}},
-  // --- Markt & Garage (immer vorhanden) ---
-  {id:'markt',   name:'Markt',        kind:'market',   x:1340, y:980,  color:'#36c98b'},
-  {id:'garage',  name:'Garage',       kind:'garage',   x:1340, y:560,  color:'#9d6cf0'},
+  // Reihe 1 (Straße y320, Gebäude südlich, Felder nördlich)
+  {id:'wald',  name:'Forst',       kind:'producer',x:720, y:513, front:'N', color:'#3f8a5b', cost:150,  out:'holz',     rate:1.0, cap:30},
+  {id:'saege', name:'Sägewerk',    kind:'factory', x:1440,y:513, front:'N', color:'#c47a3d', cost:350,  recipe:{in:{holz:3},           out:'bretter', outQty:2, time:5}},
+  {id:'markt', name:'Markt',       kind:'market',  x:2160,y:513, front:'N', color:'#36c98b'},
+  // Reihe 2 (Straße y1040, Gebäude nördlich, Felder südlich)
+  {id:'farm',  name:'Bauernhof',   kind:'producer',x:720, y:847, front:'S', color:'#b7973a', cost:180,  out:'getreide', rate:1.0, cap:30},
+  {id:'baeck', name:'Bäckerei',    kind:'factory', x:1440,y:847, front:'S', color:'#caa052', cost:380,  recipe:{in:{getreide:3},       out:'brot',    outQty:2, time:5}},
+  {id:'garage',name:'Garage',      kind:'garage',  x:2160,y:847, front:'S', color:'#9d6cf0'},
+  // Reihe 3 (Straße y1040, Gebäude südlich, Felder nördlich)
+  {id:'mine',  name:'Eisenmine',   kind:'producer',x:720, y:1233,front:'N', color:'#6b7682', cost:600,  out:'erz',      rate:0.7, cap:24},
+  {id:'schmelz',name:'Schmelze',   kind:'factory', x:1440,y:1233,front:'N', color:'#5f7387', cost:1100, recipe:{in:{erz:4},            out:'stahl',   outQty:1, time:8}},
+  {id:'werk',  name:'Werkstatt',   kind:'factory', x:2160,y:1233,front:'N', color:'#c2503f', cost:3000, recipe:{in:{stahl:2,bretter:2},out:'werkzeug',outQty:1, time:12}},
+  // Reihe 4 (Straße y1760, Gebäude nördlich, Felder südlich)
+  {id:'moebel',name:'Möbelfabrik', kind:'factory', x:720, y:1567,front:'S', color:'#6a45b0', cost:1500, recipe:{in:{bretter:4},        out:'moebel',  outQty:1, time:10}},
 ];
 const BMAP = BUILDINGS.reduce((m,b)=>(m[b.id]=b,m),{});
 
-const WORLD={w:2760,h:2000};
-const PLOT=150, PAD=66;
-const COST_GROW=1.6, RATE_GROW=1.32, CAP_GROW=1.4;
-const FACT_INCAP=24, FACT_OUTCAP=24;
+const COST_GROW=1.6, RATE_GROW=1.3, CAP_GROW=1.4, TIME_GROW=0.84;
+const INCAP_BASE=14, OUTCAP_BASE=12;
 
-// Vehicle / garage tuning
-const VEH={ capBase:10, capStep:5, speedBase:250, speedStep:26,
-            capCost:200, speedCost:200, garageGrow:1.5 };
+const VEH={ capBase:12, capStep:6, speedBase:255, speedStep:26, capCost:220, speedCost:220, garageGrow:1.5 };
 
 //---------------------------------------------------------------
 // State
@@ -169,46 +187,52 @@ function freshState(){
   const biz={};
   for(const b of BUILDINGS){
     if(b.kind==='producer') biz[b.id]={owned:false,level:0,stock:0};
-    else if(b.kind==='factory') biz[b.id]={owned:false,level:0,inStock:{},outStock:0};
+    else if(b.kind==='factory') biz[b.id]={owned:false,level:0,inStock:{},outStock:0,prog:0,busy:false};
   }
   return { money:600, biz, capLv:0, speedLv:0 };
 }
-function load(){ try{ const s=JSON.parse(localStorage.getItem('lieferstadt')); if(s&&s.biz) return s; }catch(e){} return freshState(); }
+function load(){ try{ const s=JSON.parse(localStorage.getItem('lieferstadt')); if(s&&s.biz){ migrate(s); return s; } }catch(e){} return freshState(); }
+function migrate(s){ for(const b of BUILDINGS){ const x=s.biz[b.id]; if(!x) continue;
+  if(b.kind==='factory'){ if(x.prog==null)x.prog=0; if(x.busy==null)x.busy=false; if(!x.inStock)x.inStock={}; if(x.outStock==null)x.outStock=0; } } }
 function save(){ try{ localStorage.setItem('lieferstadt',JSON.stringify(state)); }catch(e){} }
 state=load();
 
-// vehicle
-const veh={ x:WORLD.w/2, y:WORLD.h*0.66, r:17, vx:0, vy:0, heading:-Math.PI/2, inv:{} };
+const veh={ x:1080, y:680, r:16, vx:0, vy:0, heading:Math.PI/2, inv:{} };
 const cam={x:0,y:0};
 
-function vehCap(){ return VEH.capBase + state.capLv*VEH.capStep; }
-function vehSpeed(){ return VEH.speedBase + state.speedLv*VEH.speedStep; }
+function vehCap(){ return VEH.capBase+state.capLv*VEH.capStep; }
+function vehSpeed(){ return VEH.speedBase+state.speedLv*VEH.speedStep; }
 function invTotal(){ let t=0; for(const k in veh.inv) t+=veh.inv[k]; return t; }
 function invFree(){ return vehCap()-invTotal(); }
+function addInv(g,a){ veh.inv[g]=(veh.inv[g]||0)+a; if(veh.inv[g]<=0.001) delete veh.inv[g]; }
 
-// economic helpers
+// economy helpers
 function cost(b){ const s=state.biz[b.id]; if(!s.owned) return b.cost; return Math.floor(b.cost*Math.pow(COST_GROW,s.level)); }
 function prodRate(b){ const s=state.biz[b.id]; return b.rate*Math.pow(RATE_GROW,s.level-1); }
 function prodCap(b){ const s=state.biz[b.id]; return b.cap*Math.pow(CAP_GROW,Math.max(0,s.level-1)); }
-function factRate(b){ const s=state.biz[b.id]; return b.recipe.rate*Math.pow(RATE_GROW,s.level-1); }
-function factOutCap(b){ const s=state.biz[b.id]; return FACT_OUTCAP*Math.pow(CAP_GROW,Math.max(0,s.level-1)); }
-function garageCost(which){ const base=which==='cap'?VEH.capCost:VEH.speedCost; const lv=which==='cap'?state.capLv:state.speedLv;
+function craftTime(b){ const s=state.biz[b.id]; return b.recipe.time*Math.pow(TIME_GROW,s.level-1); }
+function inCap(b){ const s=state.biz[b.id]; return INCAP_BASE*Math.pow(CAP_GROW,Math.max(0,s.level-1)); }
+function outCap(b){ const s=state.biz[b.id]; return OUTCAP_BASE*Math.pow(CAP_GROW,Math.max(0,s.level-1)); }
+function garageCost(w){ const base=w==='cap'?VEH.capCost:VEH.speedCost, lv=w==='cap'?state.capLv:state.speedLv;
   return Math.floor(base*Math.pow(VEH.garageGrow,lv)); }
 
-// pads per building
-function padsFor(b){
-  const p={};
-  if(b.kind==='producer'||b.kind==='factory'){
-    p.action ={x:b.x-PAD/2, y:b.y+PLOT/2+34, w:PAD,h:PAD};   // buy / upgrade
-    p.load   ={x:b.x-PAD/2, y:b.y-PLOT/2-34-PAD, w:PAD,h:PAD};// load/unload goods
-  } else if(b.kind==='market'){
-    p.sell   ={x:b.x-PAD/2, y:b.y+PLOT/2+34, w:PAD,h:PAD};
-  } else if(b.kind==='garage'){
-    p.cap    ={x:b.x-PLOT/2-PAD-14, y:b.y-PAD/2, w:PAD,h:PAD};
-    p.speed  ={x:b.x+PLOT/2+14,     y:b.y-PAD/2, w:PAD,h:PAD};
-  }
-  return p;
+//---------------------------------------------------------------
+// Felder (3 pro Location, am Straßenrand)
+//---------------------------------------------------------------
+function fieldsFor(b){
+  let types;
+  if(b.kind==='producer'){ const o=state.biz[b.id].owned; types=o?['aufladen','details']:['bauen','details']; }
+  else if(b.kind==='factory'){ const o=state.biz[b.id].owned; types=o?['abladen','aufladen','details']:['bauen','details']; }
+  else if(b.kind==='market') types=['verkaufen','details'];
+  else if(b.kind==='garage') types=['tempo','ladung','details'];
+  const n=types.length, fy=b.y+(b.front==='N'?-OFFF:OFFF);
+  return types.map((t,i)=>{ const cx=b.x+(i-(n-1)/2)*78;
+    return {b,type:t,x:cx-FW/2,y:fy-FW/2,w:FW,h:FW}; });
 }
+const FIELD_STYLE={ bauen:{label:'BAUEN',c:'#f59e0b'}, abladen:{label:'ABLADEN',c:'#f59e0b'},
+  aufladen:{label:'AUFLADEN',c:'#60a5fa'}, details:{label:'DETAILS',c:'#cbd5e1'},
+  verkaufen:{label:'VERKAUF',c:'#4ade80'}, tempo:{label:'TEMPO',c:'#a855f7'}, ladung:{label:'LADUNG',c:'#a855f7'} };
+function allFields(){ const a=[]; for(const b of BUILDINGS) for(const f of fieldsFor(b)) a.push(f); return a; }
 function bodyRect(b){ return {x:b.x-PLOT/2,y:b.y-PLOT/2,w:PLOT,h:PLOT}; }
 function isSolid(b){ if(b.kind==='market'||b.kind==='garage') return true; return state.biz[b.id].owned; }
 
@@ -216,8 +240,11 @@ function isSolid(b){ if(b.kind==='market'||b.kind==='garage') return true; retur
 // Input
 //---------------------------------------------------------------
 const keys={};
-addEventListener('keydown',e=>{ keys[e.key.toLowerCase()]=true;
-  if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())) e.preventDefault(); });
+addEventListener('keydown',e=>{ const k=e.key.toLowerCase();
+  if(k==='e'){ if(!e.repeat) triggerAction(); e.preventDefault(); return; }
+  if(k==='escape'){ if(detailOpen) closeDetail(); return; }
+  keys[k]=true;
+  if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault(); });
 addEventListener('keyup',e=>{ keys[e.key.toLowerCase()]=false; });
 
 const stick=document.getElementById('stick'), sBase=stick.querySelector('.base'), sKnob=stick.querySelector('.knob');
@@ -242,72 +269,58 @@ function resolveCircleRect(p,r){
   const dx=p.x-nx, dy=p.y-ny, d2=dx*dx+dy*dy;
   if(d2<p.r*p.r){ const d=Math.sqrt(d2)||0.0001, push=p.r-d; p.x+=dx/d*push; p.y+=dy/d*push; }
 }
-function overlap(p,pad){ const px=Math.max(pad.x,Math.min(p.x,pad.x+pad.w)), py=Math.max(pad.y,Math.min(p.y,pad.y+pad.h));
-  return Math.hypot(p.x-px,p.y-py) < p.r+5; }
+function overlap(p,f){ const px=Math.max(f.x,Math.min(p.x,f.x+f.w)), py=Math.max(f.y,Math.min(p.y,f.y+f.h));
+  return Math.hypot(p.x-px,p.y-py) < p.r+6; }
 
 //---------------------------------------------------------------
-// Interactions
+// Actions (ausgelöst per E / Knopf)
 //---------------------------------------------------------------
-const cooldown={};          // per-building discrete action cooldown
+let currentField=null;
 const popups=[];
-let activeInfo=null;        // {title, sub} for prompt
+function popup(x,y,text,color){ popups.push({x,y,text,color,life:1.1}); }
 
-function addToInv(good,amt){ veh.inv[good]=(veh.inv[good]||0)+amt; if(veh.inv[good]<=0.001) delete veh.inv[good]; }
-
-function doAction(b){ // buy or upgrade
-  const s=state.biz[b.id], c=cost(b);
-  if(state.money<c) return;
-  if(cooldown[b.id]>0) return;
-  state.money-=c;
-  if(!s.owned){ s.owned=true; s.level=1; toast(b.name+' eröffnet!','good'); }
-  else { s.level++; toast(b.name+' → Stufe '+s.level,'good'); }
-  cooldown[b.id]=0.5;
-  popups.push({x:b.x,y:b.y,text:'-$'+fmt(c),color:'#f87171',life:1});
-  save();
-}
-function doLoad(b){ // producer pickup / factory unload+pickup
-  const s=state.biz[b.id]; if(!s.owned) return;
-  if(b.kind==='producer'){
-    const take=Math.min(s.stock, invFree());
-    if(take>0.001){ s.stock-=take; addToInv(b.out,take);
-      flashPop(b,'+'+Math.floor(take)+' '+GOODS[b.out].n, GOODS[b.out].c); }
-  } else { // factory: unload inputs from truck, then load output
-    for(const g in b.recipe.in){
-      const have=veh.inv[g]||0; if(have<=0) continue;
-      const space=FACT_INCAP-(s.inStock[g]||0);
-      const mv=Math.min(have,space);
-      if(mv>0.001){ s.inStock[g]=(s.inStock[g]||0)+mv; addToInv(g,-mv);
-        flashPop(b,'−'+Math.floor(mv)+' '+GOODS[g].n,'#94a3b8'); }
-    }
-    const take=Math.min(s.outStock, invFree());
-    if(take>0.001){ s.outStock-=take; addToInv(b.recipe.out,take);
-      flashPop(b,'+'+Math.floor(take)+' '+GOODS[b.recipe.out].n, GOODS[b.recipe.out].c); }
+function triggerAction(){ if(detailOpen||!running||!currentField) return; performAction(currentField); }
+function performAction(f){
+  const b=f.b, s=state.biz[b.id];
+  switch(f.type){
+    case 'details': openDetail(b); return;
+    case 'bauen': {
+      const c=cost(b); if(state.money<c){ toast('Zu teuer ('+fmt(c)+' $)','bad'); return; }
+      state.money-=c; s.owned=true; s.level=1; toast(b.name+' eröffnet!','good');
+      popup(b.x,b.y,'-$'+fmt(c),'#f87171'); save(); return; }
+    case 'aufladen': {
+      const good = b.kind==='producer'? b.out : b.recipe.out;
+      const src  = b.kind==='producer'? 'stock':'outStock';
+      const avail = b.kind==='producer'? s.stock : s.outStock;
+      const take=Math.min(avail, invFree());
+      if(take<0.5){ toast(invFree()<=0?'Fahrzeug voll':'Nichts vorrätig','bad'); return; }
+      if(b.kind==='producer') s.stock-=take; else s.outStock-=take;
+      addInv(good,take); popup(b.x,b.y,'+'+Math.floor(take)+' '+GOODS[good].n,GOODS[good].c); save(); return; }
+    case 'abladen': {
+      let moved=0;
+      for(const g in b.recipe.in){ const have=veh.inv[g]||0; if(have<=0) continue;
+        const space=inCap(b)-(s.inStock[g]||0); const mv=Math.min(have,space);
+        if(mv>0.001){ s.inStock[g]=(s.inStock[g]||0)+mv; addInv(g,-mv); moved+=mv; } }
+      if(moved<0.5) toast('Keine passenden Materialien geladen','bad');
+      else { popup(b.x,b.y,'abgeladen','#94a3b8'); save(); } return; }
+    case 'verkaufen': {
+      let earned=0; for(const g in veh.inv){ const v=GOODS[g].v; if(v>0){ earned+=veh.inv[g]*v; delete veh.inv[g]; } }
+      if(earned<=0){ toast('Keine Fertigwaren geladen','bad'); return; }
+      state.money+=earned; popup(b.x,b.y,'+$'+fmt(earned),'#4ade80'); toast('Verkauft: +'+fmt(earned)+' $','good'); save(); return; }
+    case 'tempo': case 'ladung': {
+      const which=f.type==='tempo'?'speed':'cap'; const c=garageCost(which);
+      if(state.money<c){ toast('Zu teuer ('+fmt(c)+' $)','bad'); return; }
+      state.money-=c; if(which==='cap'){ state.capLv++; toast('Ladekapazität → '+vehCap(),'good'); }
+      else { state.speedLv++; toast('Tempo erhöht','good'); }
+      popup(b.x,b.y,'-$'+fmt(c),'#f87171'); save(); return; }
   }
 }
-function doSell(){ // sell all sellable goods in truck
-  let earned=0, sold=0;
-  for(const g in veh.inv){ const v=GOODS[g].v; if(v>0){ earned+=veh.inv[g]*v; sold+=veh.inv[g]; delete veh.inv[g]; } }
-  if(earned>0){ state.money+=earned; flashPop(BMAP.markt,'+$'+fmt(earned),'#4ade80'); save(); }
-}
-function doGarage(which){
-  const c=garageCost(which); if(state.money<c) return; if(cooldown['garage_'+which]>0) return;
-  state.money-=c; cooldown['garage_'+which]=0.5;
-  if(which==='cap'){ state.capLv++; toast('Ladekapazität → '+vehCap(),'good'); }
-  else { state.speedLv++; toast('Tempo erhöht','good'); }
-  popups.push({x:BMAP.garage.x,y:BMAP.garage.y,text:'-$'+fmt(c),color:'#f87171',life:1});
-  save();
-}
-let _popCd=0;
-function flashPop(b,text,color){ if(_popCd>0) return; _popCd=0.25; popups.push({x:b.x,y:b.y-PLOT/2-50,text,color,life:1}); }
+document.getElementById('actBtn').addEventListener('click',triggerAction);
 
 function toast(msg,kind){ const el=document.createElement('div'); el.className='toast '+(kind||''); el.textContent=msg;
   document.getElementById('toasts').appendChild(el);
   setTimeout(()=>{ el.style.transition='opacity .3s,transform .3s'; el.style.opacity='0'; el.style.transform='translateY(-10px)';
-    setTimeout(()=>el.remove(),300); },1600); }
-
-//---------------------------------------------------------------
-// Formatting
-//---------------------------------------------------------------
+    setTimeout(()=>el.remove(),300); },1500); }
 function fmt(n){ n=Math.floor(n); if(n<1000) return ''+n;
   const u=['','K','M','B','T']; let i=0,v=n; while(v>=1000&&i<u.length-1){v/=1000;i++;}
   return (v<10?v.toFixed(2):v<100?v.toFixed(1):Math.floor(v))+u[i]; }
@@ -316,7 +329,6 @@ function fmt(n){ n=Math.floor(n); if(n<1000) return ''+n;
 // Update
 //---------------------------------------------------------------
 function update(dt){
-  // input → desired velocity (smoothed, slight vehicle inertia)
   let ix=0,iy=0;
   if(keys['w']||keys['arrowup']) iy-=1;
   if(keys['s']||keys['arrowdown']) iy+=1;
@@ -324,52 +336,34 @@ function update(dt){
   if(keys['d']||keys['arrowright']) ix+=1;
   ix+=sVec.x; iy+=sVec.y;
   const mag=Math.hypot(ix,iy); if(mag>1){ix/=mag;iy/=mag;}
-  const sp=vehSpeed();
-  const k=Math.min(1,dt*7);
+  const sp=vehSpeed(), k=Math.min(1,dt*7);
   veh.vx+=(ix*sp-veh.vx)*k; veh.vy+=(iy*sp-veh.vy)*k;
   veh.x+=veh.vx*dt; veh.y+=veh.vy*dt;
   if(Math.hypot(veh.vx,veh.vy)>12) veh.heading=Math.atan2(veh.vy,veh.vx);
-
-  // world bounds
   veh.x=Math.max(veh.r,Math.min(WORLD.w-veh.r,veh.x));
   veh.y=Math.max(veh.r,Math.min(WORLD.h-veh.r,veh.y));
-  // collide with solid buildings
   for(const b of BUILDINGS) if(isSolid(b)) resolveCircleRect(veh,bodyRect(b));
 
-  // production tick
-  for(const b of BUILDINGS){
-    const s=state.biz[b.id]; if(!s||!s.owned) continue;
+  // production
+  for(const b of BUILDINGS){ const s=state.biz[b.id]; if(!s||!s.owned) continue;
     if(b.kind==='producer'){ s.stock=Math.min(prodCap(b), s.stock+prodRate(b)*dt); }
     else if(b.kind==='factory'){
-      let out=factRate(b)*dt;
-      out=Math.min(out, factOutCap(b)-s.outStock);
-      for(const g in b.recipe.in){ out=Math.min(out,(s.inStock[g]||0)/b.recipe.in[g]); }
-      if(out>0.0001){ for(const g in b.recipe.in) s.inStock[g]-=out*b.recipe.in[g];
-        s.outStock+=out; }
+      if(!s.busy){ // try start a batch
+        let can = s.outStock+b.recipe.outQty <= outCap(b)+0.001;
+        for(const g in b.recipe.in) if((s.inStock[g]||0) < b.recipe.in[g]) can=false;
+        if(can){ for(const g in b.recipe.in) s.inStock[g]-=b.recipe.in[g]; s.busy=true; s.prog=0; }
+      } else {
+        s.prog += dt/craftTime(b);
+        if(s.prog>=1){ s.outStock+=b.recipe.outQty; s.busy=false; s.prog=0; }
+      }
     }
-    if(cooldown[b.id]>0) cooldown[b.id]-=dt;
   }
-  if(cooldown['garage_cap']>0) cooldown['garage_cap']-=dt;
-  if(cooldown['garage_speed']>0) cooldown['garage_speed']-=dt;
-  if(_popCd>0) _popCd-=dt;
 
-  // pad interactions
-  activeInfo=null;
-  for(const b of BUILDINGS){
-    const p=padsFor(b);
-    if(b.kind==='producer'||b.kind==='factory'){
-      const s=state.biz[b.id];
-      if(overlap(veh,p.action)){ if(s.owned||state.money>=cost(b)) doAction(b); setActionInfo(b); }
-      else if(s.owned && overlap(veh,p.load)){ doLoad(b); setLoadInfo(b); }
-    } else if(b.kind==='market'){
-      if(overlap(veh,p.sell)){ doSell(); activeInfo={title:'Markt',sub:'Verkauft alle Fertigwaren aus dem Fahrzeug'}; }
-    } else if(b.kind==='garage'){
-      if(overlap(veh,p.cap)){ const c=garageCost('cap'); doGarage('cap');
-        activeInfo={title:'Garage · Ladekapazität',sub:'Kapazität '+vehCap()+' → '+(vehCap()+VEH.capStep)+' · '+costSpan(c)}; }
-      else if(overlap(veh,p.speed)){ const c=garageCost('speed'); doGarage('speed');
-        activeInfo={title:'Garage · Tempo',sub:'Schnelleres Fahrzeug · '+costSpan(c)}; }
-    }
-  }
+  // current field detection
+  currentField=null; let bestD=1e9;
+  for(const f of allFields()){ if(overlap(veh,f)){
+    const cx=f.x+f.w/2, cy=f.y+f.h/2, d=Math.hypot(veh.x-cx,veh.y-cy);
+    if(d<bestD){ bestD=d; currentField=f; } } }
 
   // camera
   const tx=veh.x-VW/2, ty=veh.y-VH/2;
@@ -377,210 +371,197 @@ function update(dt){
   cam.x=Math.max(0,Math.min(WORLD.w-VW,cam.x)); if(WORLD.w<VW) cam.x=(WORLD.w-VW)/2;
   cam.y=Math.max(0,Math.min(WORLD.h-VH,cam.y)); if(WORLD.h<VH) cam.y=(WORLD.h-VH)/2;
 
-  for(let i=popups.length-1;i>=0;i--){ const p=popups[i]; p.life-=dt*1.3; p.y-=dt*38; if(p.life<=0) popups.splice(i,1); }
+  for(let i=popups.length-1;i>=0;i--){ const p=popups[i]; p.life-=dt*1.2; p.y-=dt*36; if(p.life<=0) popups.splice(i,1); }
 
   updateHUD();
   saveTimer-=dt; if(saveTimer<=0){ save(); saveTimer=4; }
 }
 let saveTimer=4;
-function costSpan(c){ return '<span class="cost '+(state.money>=c?'ok':'no')+'">$'+fmt(c)+'</span>'; }
-function setActionInfo(b){ const s=state.biz[b.id], c=cost(b);
-  if(!s.owned){ let what = b.kind==='producer' ? ('produziert '+GOODS[b.out].n)
-      : (Object.keys(b.recipe.in).map(g=>GOODS[g].n).join(' + ')+' → '+GOODS[b.recipe.out].n);
-    activeInfo={title:'Bauen: '+b.name, sub:what+' · '+costSpan(c)}; }
-  else { activeInfo={title:'Aufrüsten: '+b.name+' (Stufe '+s.level+')', sub:'schneller & mehr Lager · '+costSpan(c)}; }
-}
-function setLoadInfo(b){ const s=state.biz[b.id];
-  if(b.kind==='producer'){ activeInfo={title:b.name, sub:'Lager: '+Math.floor(s.stock)+'/'+Math.floor(prodCap(b))+' '+GOODS[b.out].n+' — fährt ins Fahrzeug'}; }
-  else { const ins=Object.keys(b.recipe.in).map(g=>GOODS[g].n+' '+Math.floor(s.inStock[g]||0)).join(', ');
-    activeInfo={title:b.name, sub:'Braucht: '+ins+' · Ausgang: '+Math.floor(s.outStock)+' '+GOODS[b.recipe.out].n}; }
-}
 
 //---------------------------------------------------------------
 // Render
 //---------------------------------------------------------------
 function roundRect(x,y,w,h,r){ ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
   ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath(); }
-
 function render(){
   ctx.clearRect(0,0,VW,VH);
-  ctx.fillStyle='#16202a'; ctx.fillRect(0,0,VW,VH); // grass base
+  ctx.fillStyle='#16202a'; ctx.fillRect(0,0,VW,VH);
   ctx.save(); ctx.translate(-cam.x,-cam.y);
-
   drawRoads();
-
-  // grid
-  ctx.strokeStyle='rgba(255,255,255,.025)'; ctx.lineWidth=1;
-  const T=50, x0=Math.floor(cam.x/T)*T, y0=Math.floor(cam.y/T)*T;
-  ctx.beginPath();
-  for(let x=x0;x<cam.x+VW;x+=T){ ctx.moveTo(x,cam.y); ctx.lineTo(x,cam.y+VH); }
-  for(let y=y0;y<cam.y+VH;y+=T){ ctx.moveTo(cam.x,y); ctx.lineTo(cam.x+VW,y); }
-  ctx.stroke();
-
   ctx.strokeStyle='rgba(255,255,255,.07)'; ctx.lineWidth=4; ctx.strokeRect(0,0,WORLD.w,WORLD.h);
-
   for(const b of BUILDINGS) drawBuilding(b);
   drawVehicle();
-
   ctx.textAlign='center'; ctx.font='700 19px system-ui';
   for(const p of popups){ ctx.globalAlpha=Math.max(0,Math.min(1,p.life)); ctx.fillStyle=p.color; ctx.fillText(p.text,p.x,p.y); }
-  ctx.globalAlpha=1;
-  ctx.restore();
+  ctx.globalAlpha=1; ctx.restore();
 }
-
 function drawRoads(){
-  // simple road grid connecting the building rows/columns
-  const roads=[
-    // horizontal bands (y center, thickness)
-    {x:200,y:520,w:2360,h:70,horiz:true},
-    {x:200,y:980,w:2360,h:80,horiz:true},
-    {x:200,y:1480,w:2360,h:70,horiz:true},
-    // vertical bands (x center)
-    {x:480, y:300,w:70,h:1400},
-    {x:900, y:300,w:70,h:1400},
-    {x:1340,y:300,w:80,h:1400},
-    {x:1740,y:300,w:70,h:1400},
-    {x:2280,y:300,w:70,h:1400},
-  ];
-  for(const r of roads){
-    const x = r.horiz ? r.x : r.x-r.w/2;
-    const y = r.horiz ? r.y-r.h/2 : r.y;
-    const w = r.horiz ? r.w : r.w;
-    const h = r.horiz ? r.h : r.h;
-    ctx.fillStyle='#222c38'; ctx.fillRect(x,y,w,h);
-    // center dashes
-    ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=3; ctx.setLineDash([18,16]);
-    ctx.beginPath();
-    if(r.horiz){ ctx.moveTo(x,r.y); ctx.lineTo(x+w,r.y); } else { ctx.moveTo(r.x,y); ctx.lineTo(r.x,y+h); }
-    ctx.stroke(); ctx.setLineDash([]);
-  }
+  ctx.fillStyle='#222c38';
+  for(const x of VROADS) ctx.fillRect(x-ROADW/2,0,ROADW,WORLD.h);
+  for(const y of HROADS) ctx.fillRect(0,y-ROADW/2,WORLD.w,ROADW);
+  ctx.strokeStyle='rgba(255,255,255,.16)'; ctx.lineWidth=3; ctx.setLineDash([20,18]);
+  ctx.beginPath();
+  for(const x of VROADS){ ctx.moveTo(x,0); ctx.lineTo(x,WORLD.h); }
+  for(const y of HROADS){ ctx.moveTo(0,y); ctx.lineTo(WORLD.w,y); }
+  ctx.stroke(); ctx.setLineDash([]);
 }
-
 function drawBuilding(b){
-  const body=bodyRect(b), pads=padsFor(b);
+  const body=bodyRect(b);
   const owned = (b.kind==='market'||b.kind==='garage') ? true : state.biz[b.id].owned;
-
-  // plot pad ground
-  ctx.fillStyle='rgba(255,255,255,.035)';
-  roundRect(b.x-PLOT/2-12,b.y-PLOT/2-12,PLOT+24,PLOT+24,16); ctx.fill();
-
+  const s=state.biz[b.id];
+  ctx.fillStyle='rgba(255,255,255,.035)'; roundRect(b.x-PLOT/2-12,b.y-PLOT/2-12,PLOT+24,PLOT+24,16); ctx.fill();
   if(owned){
     ctx.fillStyle=b.color; roundRect(body.x,body.y,PLOT,PLOT,14); ctx.fill();
     ctx.fillStyle='rgba(255,255,255,.14)'; roundRect(body.x,body.y,PLOT,PLOT*0.32,14); ctx.fill();
-    // icon: good color dot(s)
     drawBuildingIcon(b);
+    if(b.kind==='factory' && s.busy){ // progress bar
+      const w=PLOT-28; ctx.fillStyle='#0d1722'; roundRect(b.x-w/2,body.y+PLOT-22,w,9,4); ctx.fill();
+      ctx.fillStyle='#fbbf24'; roundRect(b.x-w/2,body.y+PLOT-22,w*Math.min(1,s.prog),9,4); ctx.fill(); }
   } else {
     ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=3; ctx.setLineDash([10,8]);
     roundRect(body.x,body.y,PLOT,PLOT,14); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle='rgba(255,255,255,.28)'; ctx.font='600 14px system-ui'; ctx.textAlign='center';
     ctx.fillText('Freies', b.x, b.y-6); ctx.fillText('Grundstück', b.x, b.y+12);
   }
-
-  // name + level
-  const s=state.biz[b.id];
   ctx.fillStyle=owned?'#fff':'#94a3b8'; ctx.font='800 16px system-ui'; ctx.textAlign='center';
-  let label=b.name + (s&&s.owned?(' · St '+s.level):'');
-  ctx.fillText(label, b.x, body.y-20);
-
-  // pads
-  if(b.kind==='producer'||b.kind==='factory'){
-    const c=cost(b), afford=state.money>=c;
-    drawPad(pads.action, owned?'#60a5fa':'#fbbf24', afford);
-    padText(pads.action, owned?'AUFRÜSTEN':'BAUEN', '$'+fmt(c), afford?'#4ade80':'#f87171');
-    if(owned){
-      drawPad(pads.load,'#60a5fa', true);
-      // load pad shows current stock
-      let amt = b.kind==='producer' ? Math.floor(state.biz[b.id].stock) : Math.floor(state.biz[b.id].outStock);
-      padText(pads.load,'LADEN', amt+'', '#bfdbfe');
-    }
-  } else if(b.kind==='market'){
-    drawPad(pads.sell,'#4ade80', true); padText(pads.sell,'VERKAUF','$$$','#bbf7d0');
-  } else if(b.kind==='garage'){
-    const cc=garageCost('cap'), sc=garageCost('speed');
-    drawPad(pads.cap,'#a855f7',state.money>=cc); padText(pads.cap,'LADUNG','$'+fmt(cc), state.money>=cc?'#4ade80':'#f87171');
-    drawPad(pads.speed,'#a855f7',state.money>=sc); padText(pads.speed,'TEMPO','$'+fmt(sc), state.money>=sc?'#4ade80':'#f87171');
-  }
+  ctx.fillText(b.name+(s&&s.owned?(' · St '+s.level):''), b.x, body.y-18);
+  for(const f of fieldsFor(b)) drawField(f);
 }
 function drawBuildingIcon(b){
   ctx.save();
-  if(b.kind==='producer'){ ctx.fillStyle=GOODS[b.out].c; ctx.beginPath(); ctx.arc(b.x,b.y+8,20,0,7); ctx.fill(); }
+  if(b.kind==='producer'){ ctx.fillStyle=GOODS[b.out].c; ctx.beginPath(); ctx.arc(b.x,b.y+6,20,0,7); ctx.fill(); }
   else if(b.kind==='factory'){
-    const ins=Object.keys(b.recipe.in); const n=ins.length; const sx=b.x-(n-1)*14;
-    ins.forEach((g,i)=>{ ctx.fillStyle=GOODS[g].c; ctx.beginPath(); ctx.arc(sx+i*28,b.y,9,0,7); ctx.fill(); });
-    ctx.fillStyle='rgba(255,255,255,.7)'; ctx.font='700 16px system-ui'; ctx.textAlign='center'; ctx.fillText('→',b.x,b.y+30);
-    ctx.fillStyle=GOODS[b.recipe.out].c; ctx.beginPath(); ctx.arc(b.x,b.y+48,12,0,7); ctx.fill();
-  } else if(b.kind==='market'){ ctx.fillStyle='#0c1118'; ctx.font='800 34px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('$',b.x,b.y+6); ctx.textBaseline='alphabetic'; }
-  else if(b.kind==='garage'){ ctx.fillStyle='#0c1118'; ctx.font='800 28px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🔧',b.x,b.y+4); ctx.textBaseline='alphabetic'; }
+    const ins=Object.keys(b.recipe.in), n=ins.length, sx=b.x-(n-1)*14;
+    ins.forEach((g,i)=>{ ctx.fillStyle=GOODS[g].c; ctx.beginPath(); ctx.arc(sx+i*28,b.y-8,9,0,7); ctx.fill(); });
+    ctx.fillStyle='rgba(255,255,255,.7)'; ctx.font='700 15px system-ui'; ctx.textAlign='center'; ctx.fillText('→',b.x,b.y+18);
+    ctx.fillStyle=GOODS[b.recipe.out].c; ctx.beginPath(); ctx.arc(b.x,b.y+36,12,0,7); ctx.fill();
+  } else if(b.kind==='market'){ ctx.fillStyle='#0c1118'; ctx.font='800 36px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('$',b.x,b.y+4); ctx.textBaseline='alphabetic'; }
+  else if(b.kind==='garage'){ ctx.fillStyle='#0c1118'; ctx.font='800 30px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🔧',b.x,b.y+2); ctx.textBaseline='alphabetic'; }
   ctx.restore();
 }
-function drawPad(pad,color,active){
+function drawField(f){
+  const st=FIELD_STYLE[f.type], active=currentField&&currentField.b.id===f.b.id&&currentField.type===f.type;
   ctx.save();
-  ctx.fillStyle=active?color:'rgba(120,130,145,.25)'; ctx.globalAlpha=active?0.9:0.5;
-  roundRect(pad.x,pad.y,pad.w,pad.h,10); ctx.fill(); ctx.globalAlpha=1;
-  ctx.strokeStyle=active?'rgba(255,255,255,.5)':'rgba(255,255,255,.12)'; ctx.lineWidth=2;
-  roundRect(pad.x,pad.y,pad.w,pad.h,10); ctx.stroke(); ctx.restore();
+  ctx.fillStyle=st.c; ctx.globalAlpha=active?1:0.82;
+  roundRect(f.x,f.y,f.w,f.h,10); ctx.fill(); ctx.globalAlpha=1;
+  ctx.strokeStyle=active?'#fff':'rgba(255,255,255,.35)'; ctx.lineWidth=active?3:2;
+  roundRect(f.x,f.y,f.w,f.h,10); ctx.stroke();
+  const dark = f.type==='details';
+  ctx.fillStyle=dark?'#0c1118':'#0c1118'; ctx.textAlign='center'; ctx.font='800 11px system-ui';
+  ctx.fillText(st.label, f.x+f.w/2, f.y+f.h/2-3);
+  // dynamic value line
+  let sub=fieldValueText(f); if(sub){ ctx.font='700 11px system-ui'; ctx.fillText(sub, f.x+f.w/2, f.y+f.h/2+12); }
+  ctx.restore();
 }
-function padText(pad,top,bot,botCol){
-  ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.font='800 11px system-ui';
-  ctx.fillText(top, pad.x+pad.w/2, pad.y+pad.h/2-2);
-  ctx.font='700 11px system-ui'; ctx.fillStyle=botCol||'#fff';
-  ctx.fillText(bot, pad.x+pad.w/2, pad.y+pad.h/2+13);
+function fieldValueText(f){ const b=f.b, s=state.biz[b.id];
+  if(f.type==='bauen') return '$'+fmt(cost(b));
+  if(f.type==='tempo') return '$'+fmt(garageCost('speed'));
+  if(f.type==='ladung') return '$'+fmt(garageCost('cap'));
+  if(f.type==='aufladen'){ const v=b.kind==='producer'?s.stock:s.outStock; return Math.floor(v)+''; }
+  if(f.type==='abladen'){ return Object.keys(b.recipe.in).map(g=>Math.floor(s.inStock[g]||0)).join('/'); }
+  return '';
 }
 function drawVehicle(){
   const x=veh.x,y=veh.y;
   ctx.fillStyle='rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(x,y+6,22,12,0,0,7); ctx.fill();
   ctx.save(); ctx.translate(x,y); ctx.rotate(veh.heading);
-  // truck body
   ctx.fillStyle='#e2e8f0'; roundRect(-20,-13,40,26,6); ctx.fill();
-  ctx.fillStyle='#334155'; roundRect(2,-11,16,22,4); ctx.fill(); // cab
-  // cargo color hint
-  const firstGood=Object.keys(veh.inv)[0];
-  if(firstGood){ ctx.fillStyle=GOODS[firstGood].c; roundRect(-18,-9,16,18,3); ctx.fill(); }
-  ctx.fillStyle='#0f172a'; ctx.fillRect(-14,-15,8,4); ctx.fillRect(-14,11,8,4);
-  ctx.fillRect(8,-15,8,4); ctx.fillRect(8,11,8,4); // wheels
+  ctx.fillStyle='#334155'; roundRect(2,-11,16,22,4); ctx.fill();
+  const fg=Object.keys(veh.inv)[0]; if(fg){ ctx.fillStyle=GOODS[fg].c; roundRect(-18,-9,16,18,3); ctx.fill(); }
+  ctx.fillStyle='#0f172a'; ctx.fillRect(-14,-15,8,4); ctx.fillRect(-14,11,8,4); ctx.fillRect(8,-15,8,4); ctx.fillRect(8,11,8,4);
   ctx.restore();
 }
 
 //---------------------------------------------------------------
-// HUD
+// HUD + Action button
 //---------------------------------------------------------------
-const elMoney=document.querySelector('#money .val');
-const elChips=document.querySelector('#cargo .chips');
-const elCapNum=document.getElementById('capnum');
-const elCapBar=document.querySelector('#capbar i');
-const promptEl=document.getElementById('prompt');
+const elMoney=document.querySelector('#money .val'), elChips=document.querySelector('#cargo .chips');
+const elCapNum=document.getElementById('capnum'), elCapBar=document.querySelector('#capbar i');
+const actBtn=document.getElementById('actBtn'), actRing=actBtn.querySelector('.ring');
 function updateHUD(){
   elMoney.textContent='$'+fmt(state.money);
   const tot=invTotal(), cap=vehCap();
-  elCapNum.textContent=Math.floor(tot)+'/'+cap;
-  elCapBar.style.width=Math.min(100,tot/cap*100)+'%';
-  const keys2=Object.keys(veh.inv);
-  if(!keys2.length){ elChips.innerHTML='<span class="chip empty">leer</span>'; }
-  else { elChips.innerHTML=keys2.map(g=>`<span class="chip"><span class="d" style="background:${GOODS[g].c}"></span>${GOODS[g].n} ${Math.floor(veh.inv[g])}</span>`).join(''); }
-
-  if(activeInfo){ promptEl.classList.add('show');
-    promptEl.querySelector('.title').textContent=activeInfo.title;
-    promptEl.querySelector('.sub').innerHTML=activeInfo.sub;
-  } else promptEl.classList.remove('show');
+  elCapNum.textContent=Math.floor(tot)+'/'+cap; elCapBar.style.width=Math.min(100,tot/cap*100)+'%';
+  const ks=Object.keys(veh.inv);
+  elChips.innerHTML = ks.length ? ks.map(g=>`<span class="chip"><span class="d" style="background:${GOODS[g].c}"></span>${GOODS[g].n} ${Math.floor(veh.inv[g])}</span>`).join('') : '<span class="chip empty">leer</span>';
+  // action button
+  if(currentField && running && !detailOpen){ const st=FIELD_STYLE[currentField.type];
+    actBtn.classList.add('show'); actRing.style.background=st.c;
+    actRing.textContent=st.label+' · '+currentField.b.name.split(' ')[0];
+  } else actBtn.classList.remove('show');
 }
+
+//---------------------------------------------------------------
+// Details modal
+//---------------------------------------------------------------
+const detail=document.getElementById('detail'), detailBody=document.getElementById('detailBody');
+let detailOpen=false, detailFor=null;
+function goodChip(g,qty){ return `<span class="g"><span class="d" style="background:${GOODS[g].c}"></span>${qty?qty+'× ':''}${GOODS[g].n}</span>`; }
+function openDetail(b){ detailFor=b; detailOpen=true; running=false; detail.classList.add('show'); renderDetail(); }
+function closeDetail(){ detailOpen=false; detailFor=null; detail.classList.remove('show'); if(gameStarted) running=true; last=0; }
+function renderDetail(){ const b=detailFor; if(!b) return; const s=state.biz[b.id]; let h='';
+  h+=`<h2><span style="width:16px;height:16px;border-radius:5px;background:${b.color};display:inline-block"></span>${b.name}</h2>`;
+  if(b.kind==='producer'){
+    h+=`<div class="tag">Rohstoff-Produzent${s.owned?' · Stufe '+s.level:''}</div>`;
+    h+=`<p>Stellt automatisch ${goodChip(b.out)} her – ganz ohne Materialeinsatz. Fahr das ${FIELD_STYLE.aufladen.label}-Feld an, um den Vorrat ins Fahrzeug zu laden.</p>`;
+    if(s.owned){
+      h+=`<div class="stat"><span class="k">Produktion</span><span class="v">${prodRate(b).toFixed(2)} ${GOODS[b.out].n}/s</span></div>`;
+      h+=`<div class="stat"><span class="k">Lager</span><span class="v">${Math.floor(s.stock)} / ${Math.floor(prodCap(b))}</span></div>`;
+      h+=upgradeBtn(b);
+    } else h+=buildBtn(b);
+  } else if(b.kind==='factory'){
+    const r=b.recipe;
+    h+=`<div class="tag">Fabrik${s.owned?' · Stufe '+s.level:''}</div>`;
+    h+=`<div class="recipe">${Object.entries(r.in).map(([g,q])=>goodChip(g,q)).join(' + ')} <span style="color:#64748b">→</span> ${goodChip(r.out,r.outQty)}</div>`;
+    h+=`<p>Sobald genug Material abgeladen ist, produziert die Fabrik <b>automatisch</b> – eine Charge dauert Zeit. Material per ${FIELD_STYLE.abladen.label} liefern, Fertigware per ${FIELD_STYLE.aufladen.label} abholen.</p>`;
+    if(s.owned){
+      h+=`<div class="stat"><span class="k">Dauer je Charge</span><span class="v">${craftTime(b).toFixed(1)} s → ${r.outQty}× ${GOODS[r.out].n}</span></div>`;
+      for(const g in r.in) h+=`<div class="stat"><span class="k">Eingang ${GOODS[g].n}</span><span class="v">${Math.floor(s.inStock[g]||0)} / ${Math.floor(inCap(b))}</span></div>`;
+      h+=`<div class="stat"><span class="k">Ausgang ${GOODS[r.out].n}</span><span class="v">${Math.floor(s.outStock)} / ${Math.floor(outCap(b))}</span></div>`;
+      h+=`<div class="stat"><span class="k">Status</span><span class="v">${s.busy?('Produziert… '+Math.round(s.prog*100)+'%'):'Wartet auf Material'}</span></div>`;
+      if(s.busy) h+=`<div class="pbar"><i style="width:${Math.round(s.prog*100)}%"></i></div>`;
+      h+=upgradeBtn(b);
+    } else h+=buildBtn(b);
+  } else if(b.kind==='market'){
+    h+=`<div class="tag">Markt</div><p>Verkauft alle Fertigwaren aus deinem Fahrzeug. Rohstoffe (Holz, Getreide, Erz) kauft niemand – die musst du erst veredeln.</p>`;
+    h+=`<div class="stat"><span class="k" style="font-weight:700;color:#cbd5e1">Ware</span><span class="v">Preis / Stück</span></div>`;
+    for(const g in GOODS) if(GOODS[g].v>0) h+=`<div class="stat"><span class="k">${goodChip(g)}</span><span class="v" style="color:#4ade80">$${GOODS[g].v}</span></div>`;
+  } else if(b.kind==='garage'){
+    h+=`<div class="tag">Garage</div><p>Rüste dein Lieferfahrzeug auf. Fahr die Felder ${FIELD_STYLE.tempo.label} bzw. ${FIELD_STYLE.ladung.label} an oder nutze die Knöpfe hier.</p>`;
+    h+=`<div class="stat"><span class="k">Ladekapazität</span><span class="v">${vehCap()} (Stufe ${state.capLv})</span></div>`;
+    h+=`<div class="stat"><span class="k">Tempo</span><span class="v">Stufe ${state.speedLv}</span></div>`;
+    const cc=garageCost('cap'), sc=garageCost('speed');
+    h+=`<div class="btnrow"><button class="btn purple" id="dBtnLadung" ${state.money<cc?'disabled':''}>+Ladung ($${fmt(cc)})</button>`+
+       `<button class="btn purple" id="dBtnTempo" ${state.money<sc?'disabled':''}>+Tempo ($${fmt(sc)})</button></div>`;
+  }
+  h+=`<button class="btn ghost" id="dClose" style="margin-top:14px">Schließen</button>`;
+  detailBody.innerHTML=h;
+  const byId=id=>document.getElementById(id);
+  byId('dClose').onclick=closeDetail;
+  if(byId('dBuild')) byId('dBuild').onclick=()=>{ performAction({b,type:'bauen'}); renderDetail(); };
+  if(byId('dUp')) byId('dUp').onclick=()=>{ const c=cost(b); if(state.money>=c){ state.money-=c; s.level++; toast(b.name+' → Stufe '+s.level,'good'); save(); renderDetail(); } else toast('Zu teuer','bad'); };
+  if(byId('dBtnLadung')) byId('dBtnLadung').onclick=()=>{ performAction({b,type:'ladung'}); renderDetail(); };
+  if(byId('dBtnTempo')) byId('dBtnTempo').onclick=()=>{ performAction({b,type:'tempo'}); renderDetail(); };
+}
+function buildBtn(b){ const c=cost(b); return `<button class="btn" id="dBuild" ${state.money<c?'disabled':''}>Bauen – $${fmt(c)}</button>`; }
+function upgradeBtn(b){ const c=cost(b); return `<button class="btn blue" id="dUp" ${state.money<c?'disabled':''}>Aufrüsten auf Stufe ${state.biz[b.id].level+1} – $${fmt(c)}</button>`; }
 
 //---------------------------------------------------------------
 // Loop
 //---------------------------------------------------------------
-let last=0, running=false;
+let last=0, running=false, gameStarted=false;
 function frame(t){ if(!last) last=t; let dt=(t-last)/1000; last=t; if(dt>0.05) dt=0.05;
-  if(running) update(dt); render(); requestAnimationFrame(frame); }
+  if(running&&!detailOpen) update(dt); render(); requestAnimationFrame(frame); }
 requestAnimationFrame(frame);
 
 //---------------------------------------------------------------
 // Menu
 //---------------------------------------------------------------
 const overlay=document.getElementById('overlay');
-document.getElementById('startBtn').onclick=()=>{ overlay.classList.remove('show'); running=true; last=0; };
+document.getElementById('startBtn').onclick=()=>{ overlay.classList.remove('show'); running=true; gameStarted=true; last=0; };
 document.getElementById('menuBtn').onclick=()=>{ overlay.classList.add('show'); running=false; };
 document.getElementById('resetBtn').onclick=()=>{ if(confirm('Spielstand wirklich zurücksetzen?')){
-  state=freshState(); save(); for(const k in veh.inv) delete veh.inv[k];
-  veh.x=WORLD.w/2; veh.y=WORLD.h*0.66; toast('Neu gestartet','good'); } };
+  state=freshState(); save(); for(const k in veh.inv) delete veh.inv[k]; veh.x=1080; veh.y=680; toast('Neu gestartet','good'); } };
 </script>
 </body>
 </html>
